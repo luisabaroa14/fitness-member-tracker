@@ -39,3 +39,9 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+### Deploy to Firebase
+
+```sh
+firebase deploy --only hosting:firebaseHostingName
+```
