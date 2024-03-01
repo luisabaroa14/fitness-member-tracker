@@ -36,6 +36,7 @@
 import { ref, onMounted } from 'vue'
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
+import { USERS } from '@/utils/constants'
 
 const db = getFirestore(firebaseApp)
 
@@ -43,7 +44,7 @@ const users = ref([])
 
 onMounted(async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'users'))
+    const querySnapshot = await getDocs(collection(db, USERS))
     querySnapshot.forEach((doc) => {
       users.value.push({ id: doc.id, ...doc.data() })
     })

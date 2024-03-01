@@ -11,7 +11,11 @@
       <!-- Subscription Data -->
       <div v-for="(subscription, index) in user.subscriptionData" :key="index">
         <label>Subscription Type:</label>
-        <input type="text" v-model="subscription.type" required /><br />
+        <select v-model="subscription.type">
+          <option v-for="(subscriptionType, key) in SUBSCRIPTIONS" :value="key" :key="key">
+            {{ subscriptionType.name }}
+          </option></select
+        ><br />
         <label>Subscription Start Date:</label>
         <input type="date" v-model="subscription.startDate" required /><br />
         <label>Subscription End Date:</label>
@@ -32,6 +36,7 @@ import { ref, onMounted } from 'vue'
 import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
 import { useRoute } from 'vue-router'
+import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
 
 const db = getFirestore(firebaseApp)
 const route = useRoute()
@@ -41,7 +46,7 @@ const user = ref({})
 
 onMounted(async () => {
   try {
-    const docRef = doc(db, 'users', userId.value)
+    const docRef = doc(db, USERS, userId.value)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       user.value = docSnap.data()
@@ -56,7 +61,7 @@ onMounted(async () => {
 
 const updateUser = async () => {
   try {
-    const userRef = doc(db, 'users', userId.value)
+    const userRef = doc(db, USERS, userId.value)
     await updateDoc(userRef, user.value)
     alert('User updated successfully!')
   } catch (error) {
@@ -69,7 +74,7 @@ const addSubscription = () => {
   user.value.subscriptionData.push({
     type: '',
     startDate: '',
-    endDate: ''
+    endDate: null
   })
 }
 
