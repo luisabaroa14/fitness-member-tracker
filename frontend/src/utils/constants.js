@@ -1,4 +1,5 @@
 export const USERS = 'users'
+export const PAYMENTS = 'payments'
 
 export const SUBSCRIPTIONS = Object.freeze({
   0: {

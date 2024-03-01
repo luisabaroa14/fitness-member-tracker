@@ -25,7 +25,10 @@
             </ul>
             <span v-else>No subscriptions</span>
           </td>
-          <router-link :to="{ name: 'edit-user', params: { id: user.id } }">Edit</router-link>
+          <router-link :to="{ name: 'edit-user', params: { id: user.id } }"> Edit </router-link>
+          <router-link :to="{ name: 'add-payment', params: { id: user.id } }">
+            Add payment
+          </router-link>
         </tr>
       </tbody>
     </table>

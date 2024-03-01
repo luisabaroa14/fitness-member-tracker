@@ -47,7 +47,7 @@ const user = ref({
 
 const createUser = async () => {
   try {
-    await addDoc(collection(db, 'users'), {
+    await addDoc(collection(db, USERS), {
       name: user.value.name,
       mail: user.value.mail,
       subscriptionData: [
