@@ -17,9 +17,18 @@
           </option></select
         ><br />
         <label>Subscription Start Date:</label>
-        <input type="date" v-model="subscription.startDate" required /><br />
+        <input
+          type="date"
+          :value="formattedDate(subscription.startDate)"
+          @input="updateDate($event.target.value, subscription, 'startDate')"
+          required
+        /><br />
         <label>Subscription End Date:</label>
-        <input type="date" v-model="subscription.endDate" /><br />
+        <input
+          type="date"
+          :value="formattedDate(subscription.endDate)"
+          @input="updateDate($event.target.value, subscription, 'endDate')"
+        /><br />
         <button type="button" @click="removeSubscription(index)">Remove Subscription</button>
         <hr />
       </div>
@@ -50,6 +59,10 @@ onMounted(async () => {
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       user.value = docSnap.data()
+      user.value.subscriptionData.forEach((subscription) => {
+        subscription.startDate = subscription.startDate?.toDate()
+        subscription.endDate = subscription.endDate?.toDate()
+      })
     } else {
       console.error('User not found')
     }
@@ -58,6 +71,16 @@ onMounted(async () => {
     alert('An error occurred while fetching user.')
   }
 })
+
+// Function to format dates
+const formattedDate = (date) => {
+  return date ? date.toISOString().substr(0, 10) : ''
+}
+
+// Function to update dates
+const updateDate = (value, subscription, field) => {
+  subscription[field] = new Date(value + 'T00:00:00')
+}
 
 const updateUser = async () => {
   try {

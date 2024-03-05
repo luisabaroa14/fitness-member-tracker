@@ -40,7 +40,7 @@ const user = ref({
   name: '',
   mail: '',
   subscriptionType: 0,
-  subscriptionStartDate: '',
+  subscriptionStartDate: null,
   subscriptionEndDate: null,
   startDate: ''
 })
@@ -53,21 +53,24 @@ const createUser = async () => {
       subscriptionData: [
         {
           type: user.value.subscriptionType,
-          startDate: user.value.subscriptionStartDate,
+          startDate: user.value.subscriptionStartDate
+            ? new Date(user.value.subscriptionStartDate + 'T00:00:00')
+            : null,
           endDate: user.value.subscriptionEndDate
+            ? new Date(user.value.subscriptionEndDate + 'T00:00:00')
+            : null
         }
       ],
-      startDate: user.value.startDate
+      startDate: user.value.startDate ? new Date(user.value.startDate + 'T00:00:00') : null
     })
 
     user.value = {
       name: '',
       mail: '',
       subscriptionType: '',
-      subscriptionStartDate: '',
-      subscriptionEndDate: '',
-      startDate: '',
-      payDate: ''
+      subscriptionStartDate: null,
+      subscriptionEndDate: null,
+      startDate: ''
     }
 
     alert('User created successfully!')

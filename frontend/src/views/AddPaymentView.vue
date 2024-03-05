@@ -14,9 +14,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { collection, addDoc, getFirestore } from 'firebase/firestore'
+import { collection, doc, addDoc, getFirestore } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
-import { PAYMENTS } from '@/utils/constants'
+import { PAYMENTS, USERS } from '@/utils/constants'
 
 const db = getFirestore(firebaseApp)
 const route = useRoute()
@@ -27,10 +27,19 @@ const date = ref('')
 
 const addPayment = async () => {
   try {
+
+    // // Example of adding a subcollection to a user
+    // const paymentsCollectionRef = collection(db, USERS, userId.value, PAYMENTS)
+    // // Add payment to the user's payments collection
+    // await addDoc(paymentsCollectionRef, {
+    //   amount: amount.value,
+    //   date: new Date(date.value + 'T00:00:00')
+    // })
+
     await addDoc(collection(db, PAYMENTS), {
-      amount: amount.value,
       userId: userId.value,
-      date: date.value
+      amount: amount.value,
+      date: new Date(date.value + 'T00:00:00')
     })
 
     // Clear the form after adding payment
