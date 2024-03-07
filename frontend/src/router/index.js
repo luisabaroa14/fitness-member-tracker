@@ -4,7 +4,7 @@ import CreateUserView from '@/views/CreateUserView.vue'
 import UsersView from '@/views/UsersView.vue'
 import EditUserView from '@/views/EditUserView.vue'
 import AddPaymentView from '@/views/AddPaymentView.vue'
-import UserPaymentsView from '@/views/UserPaymentsView.vue'
+import AddClassView from '@/views/AddClassView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,9 +35,9 @@ const router = createRouter({
       name: 'add-payment'
     },
     {
-      path: '/user-payments/:id',
-      component: UserPaymentsView,
-      name: 'user-payments'
+      path: '/add-class/:id',
+      component: AddClassView,
+      name: 'add-class'
     }
   ]
 })
