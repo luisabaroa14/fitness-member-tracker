@@ -54,21 +54,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { PAYMENTS, SUBSCRIPTIONS } from '@/utils/constants'
-import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore'
+import { SUBSCRIPTIONS } from '@/utils/constants'
 import { getUsers } from '@/services/firestore/usersService'
-import firebaseApp from '@/utils/firebase'
-
-const db = getFirestore(firebaseApp)
+import { getPayments } from '@/services/firestore/paymentsService'
 
 const users = ref([])
 const payments = ref([])
 
 const fetchPayments = async () => {
   try {
-    const paymentsCollection = collection(db, PAYMENTS)
-
-    const querySnapshot = await getDocs(query(paymentsCollection, orderBy('date', 'desc')))
+    const querySnapshot = await getPayments()
 
     payments.value = querySnapshot.docs.map((doc) => {
       const payments = doc.data()

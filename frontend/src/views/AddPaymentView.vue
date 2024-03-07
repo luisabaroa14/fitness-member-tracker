@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Add Payment</h2>
-    <form @submit.prevent="addPayment">
+    <form @submit.prevent="createPayment">
       <label>Amount:</label>
       <input type="number" v-model.number="amount" required /><br />
       <label>Date:</label>
@@ -25,7 +25,7 @@
             <td>${{ payment.amount }}</td>
             <td>{{ payment.date?.toDateString() }}</td>
             <td>
-              <button @click="deletePayment(payment.id)">Delete</button>
+              <button @click="removePayment(payment.id)">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -37,22 +37,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  collection,
-  doc,
-  addDoc,
-  getFirestore,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-  orderBy
-} from 'firebase/firestore'
-import firebaseApp from '@/utils/firebase'
-import { PAYMENTS } from '@/utils/constants'
+import { addPayment, deletePayment, getUserPayments } from '@/services/firestore/paymentsService'
 import { maxInputDate } from '@/utils/functions'
 
-const db = getFirestore(firebaseApp)
 const route = useRoute()
 const userId = ref(route.params.id)
 
@@ -64,21 +51,9 @@ onMounted(async () => {
   fetchPayments()
 })
 
-const addPayment = async () => {
+const createPayment = async () => {
   try {
-    // // Example of adding a subcollection to a user
-    // const paymentsCollectionRef = collection(db, USERS, userId.value, PAYMENTS)
-    // // Add payment to the user's payments collection
-    // await addDoc(paymentsCollectionRef, {
-    //   amount: amount.value,
-    //   date: new Date(date.value + 'T00:00:00')
-    // })
-
-    const docRef = await addDoc(collection(db, PAYMENTS), {
-      userId: userId.value,
-      amount: amount.value,
-      date: new Date(date.value + 'T00:00:00')
-    })
+    const docRef = await addPayment(userId.value, amount.value, date.value)
 
     alert('Payment added successfully!')
 
@@ -99,9 +74,9 @@ const addPayment = async () => {
   }
 }
 
-const deletePayment = async (paymentId) => {
+const removePayment = async (paymentId) => {
   try {
-    await deleteDoc(doc(db, PAYMENTS, paymentId))
+    await deletePayment(paymentId)
     payments.value = payments.value.filter((payment) => payment.id !== paymentId)
     alert('Payment deleted successfully!')
   } catch (error) {
@@ -112,11 +87,7 @@ const deletePayment = async (paymentId) => {
 
 const fetchPayments = async () => {
   try {
-    const paymentsCollection = collection(db, PAYMENTS)
-
-    const querySnapshot = await getDocs(
-      query(paymentsCollection, where('userId', '==', userId.value), orderBy('date', 'desc'))
-    )
+    const querySnapshot = await getUserPayments(userId.value)
 
     payments.value = querySnapshot.docs.map((doc) => {
       const payments = doc.data()

@@ -42,7 +42,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { PAYMENTS, USERS, SUBSCRIPTIONS, CLASSES } from '@/utils/constants'
+import { USERS, SUBSCRIPTIONS, CLASSES } from '@/utils/constants'
+import { getUserPayments } from '@/services/firestore/paymentsService'
 import {
   getFirestore,
   collection,
@@ -101,11 +102,7 @@ const weekClasses = computed(() => {
 
 const fetchUserPayments = async () => {
   try {
-    const paymentsCollection = collection(db, PAYMENTS)
-
-    const querySnapshot = await getDocs(
-      query(paymentsCollection, where('userId', '==', userId.value), orderBy('date', 'desc'))
-    )
+    const querySnapshot = await getUserPayments(userId.value)
 
     payments.value = querySnapshot.docs.map((doc) => {
       const payments = doc.data()
