@@ -6,7 +6,7 @@
     <p>Debt: ${{ user?.totalDebt }}</p>
   </div>
   <h2>Add Class</h2>
-  <form @submit.prevent="addClass">
+  <form @submit.prevent="createClass">
     <label>Date:</label>
     <input type="date" v-model="date" required :max="maxInputDate()" /><br />
     <button type="submit">Add Class</button>
@@ -31,7 +31,7 @@
         <tr v-for="c in classes" :key="c.id">
           <td>{{ c.date?.toDateString() }}</td>
           <td>
-            <button @click="deleteClass(c.id)">Delete</button>
+            <button @click="removeClass(c.id)">Delete</button>
           </td>
         </tr>
       </tbody>
@@ -42,7 +42,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { USERS, SUBSCRIPTIONS, CLASSES } from '@/utils/constants'
+import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
 import { getUserPayments } from '@/services/firestore/paymentsService'
 import {
   getFirestore,
@@ -56,6 +56,7 @@ import {
   doc,
   where
 } from 'firebase/firestore'
+import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
 import firebaseApp from '@/utils/firebase'
 import { maxInputDate } from '@/utils/functions'
 
@@ -117,11 +118,7 @@ const fetchUserPayments = async () => {
 
 const fetchUserClasses = async () => {
   try {
-    const classessCollection = collection(db, CLASSES)
-
-    const querySnapshot = await getDocs(
-      query(classessCollection, where('userId', '==', userId.value), orderBy('date', 'desc'))
-    )
+    const querySnapshot = await getUserClasses(userId.value)
 
     classes.value = querySnapshot.docs.map((doc) => {
       const classes = doc.data()
@@ -262,12 +259,9 @@ const getNextPaymentDate = (startDate) => {
   return nextPaymentDate
 }
 
-const addClass = async () => {
+const createClass = async () => {
   try {
-    const docRef = await addDoc(collection(db, CLASSES), {
-      userId: userId.value,
-      date: new Date(date.value + 'T00:00:00')
-    })
+    const docRef = await addClass(userId.value, date.value)
 
     alert('Class added successfully!')
 
@@ -289,9 +283,9 @@ const addClass = async () => {
   }
 }
 
-const deleteClass = async (classId) => {
+const removeClass = async (classId) => {
   try {
-    await deleteDoc(doc(db, CLASSES, classId))
+    await deleteClass(classId)
     classes.value = classes.value.filter((c) => c.id !== classId)
     alert('Class deleted successfully!')
   } catch (error) {
