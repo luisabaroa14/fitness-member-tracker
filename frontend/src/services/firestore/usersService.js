@@ -52,7 +52,7 @@ export const getUser = async (userId) => {
     const docRef = doc(db, USERS, userId)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      return docSnap.data()
+      return docSnap
     } else {
       console.error('User not found')
       return null
@@ -62,6 +62,7 @@ export const getUser = async (userId) => {
     throw error
   }
 }
+
 export const getUsers = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, USERS))

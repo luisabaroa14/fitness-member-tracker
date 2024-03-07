@@ -16,11 +16,11 @@ const db = getFirestore(firebaseApp)
 
 export const addPayment = async (userId, amount, date) => {
   // // Example of adding a subcollection to a user
-  // const paymentsCollectionRef = collection(db, USERS, userId.value, PAYMENTS)
+  // const paymentsCollectionRef = collection(db, USERS, userId, PAYMENTS)
   // // Add payment to the user's payments collection
   // await addDoc(paymentsCollectionRef, {
-  //   amount: amount.value,
-  //   date: new Date(date.value + 'T00:00:00')
+  //   amount: amount,
+  //   date: new Date(date + 'T00:00:00')
   // })
 
   try {

@@ -59,7 +59,7 @@ onMounted(async () => {
     const response = await getUser(userId.value)
 
     if (response) {
-      user.value = response
+      user.value = response.data()
       user.value.subscriptionData.forEach((subscription) => {
         subscription.startDate = subscription.startDate?.toDate() ?? null
         subscription.endDate = subscription.endDate?.toDate() ?? null

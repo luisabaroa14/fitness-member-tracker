@@ -42,25 +42,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { SUBSCRIPTIONS } from '@/utils/constants'
+import { getUser } from '@/services/firestore/usersService'
 import { getUserPayments } from '@/services/firestore/paymentsService'
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  getDocs,
-  getDoc,
-  addDoc,
-  deleteDoc,
-  doc,
-  where
-} from 'firebase/firestore'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
-import firebaseApp from '@/utils/firebase'
 import { maxInputDate } from '@/utils/functions'
 
-const db = getFirestore(firebaseApp)
 const route = useRoute()
 
 const userId = ref(route.params.id)
@@ -133,11 +120,10 @@ const fetchUserClasses = async () => {
 
 const fetchUser = async () => {
   try {
-    const userDocRef = doc(db, USERS, userId.value)
-    const userDocSnap = await getDoc(userDocRef)
+    const response = await getUser(userId.value)
 
-    if (userDocSnap.exists()) {
-      const userData = { id: userDocSnap.id, ...userDocSnap.data() }
+    if (response) {
+      const userData = { id: response.id, ...response.data() }
 
       let totalDebt = 0
       userData.subscriptionData.forEach((subscription) => {
