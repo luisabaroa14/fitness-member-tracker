@@ -54,8 +54,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { PAYMENTS, USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { PAYMENTS, SUBSCRIPTIONS } from '@/utils/constants'
 import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore'
+import { getUsers } from '@/services/firestore/usersService'
 import firebaseApp from '@/utils/firebase'
 
 const db = getFirestore(firebaseApp)
@@ -82,7 +83,7 @@ const fetchPayments = async () => {
 
 const fetchUsers = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, USERS))
+    const querySnapshot = await getUsers()
     querySnapshot.forEach((doc) => {
       const user = doc.data()
       user.startDate = user.startDate?.toDate()

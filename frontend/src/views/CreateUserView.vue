@@ -35,12 +35,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { collection, addDoc, getFirestore } from 'firebase/firestore'
-import firebaseApp from '@/utils/firebase'
-import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { addUser } from '@/services/firestore/usersService'
+import { SUBSCRIPTIONS } from '@/utils/constants'
 import { maxInputDate } from '@/utils/functions'
-
-const db = getFirestore(firebaseApp)
 
 const user = ref({
   name: '',
@@ -53,23 +50,9 @@ const user = ref({
 
 const createUser = async () => {
   try {
-    await addDoc(collection(db, USERS), {
-      name: user.value.name,
-      mail: user.value.mail,
-      subscriptionData: [
-        {
-          type: user.value.subscriptionType,
-          startDate: user.value.subscriptionStartDate
-            ? new Date(user.value.subscriptionStartDate + 'T00:00:00')
-            : null,
-          endDate: user.value.subscriptionEndDate
-            ? new Date(user.value.subscriptionEndDate + 'T00:00:00')
-            : null
-        }
-      ],
-      startDate: user.value.startDate ? new Date(user.value.startDate + 'T00:00:00') : null
-    })
+    await addUser(user.value)
 
+    // Clear form
     user.value = {
       name: '',
       mail: '',

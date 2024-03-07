@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Edit User</h2>
-    <form @submit.prevent="updateUser">
+    <form @submit.prevent="updateUserData">
       <label>Name:</label>
       <input type="text" v-model="user.name" required /><br />
       <label>Email:</label>
@@ -44,13 +44,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore'
-import firebaseApp from '@/utils/firebase'
+import { getUser, updateUser } from '@/services/firestore/usersService'
 import { useRoute } from 'vue-router'
-import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { SUBSCRIPTIONS } from '@/utils/constants'
 import { maxInputDate } from '@/utils/functions'
 
-const db = getFirestore(firebaseApp)
 const route = useRoute()
 
 const userId = ref(route.params.id)
@@ -58,16 +56,16 @@ const user = ref({})
 
 onMounted(async () => {
   try {
-    const docRef = doc(db, USERS, userId.value)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      user.value = docSnap.data()
+    const response = await getUser(userId.value)
+
+    if (response) {
+      user.value = response
       user.value.subscriptionData.forEach((subscription) => {
         subscription.startDate = subscription.startDate?.toDate() ?? null
         subscription.endDate = subscription.endDate?.toDate() ?? null
       })
     } else {
-      console.error('User not found')
+      alert('User not found.')
     }
   } catch (error) {
     console.error('Error fetching user: ', error.message)
@@ -85,10 +83,9 @@ const updateDate = (value, subscription, field) => {
   subscription[field] = new Date(value + 'T00:00:00')
 }
 
-const updateUser = async () => {
+const updateUserData = async () => {
   try {
-    const userRef = doc(db, USERS, userId.value)
-    await updateDoc(userRef, user.value)
+    await updateUser(user.value, userId.value)
     alert('User updated successfully!')
   } catch (error) {
     console.error('Error updating user: ', error.message)
