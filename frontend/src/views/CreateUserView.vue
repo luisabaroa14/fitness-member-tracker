@@ -16,12 +16,17 @@
       ><br />
 
       <label>Subscription Start Date:</label>
-      <input type="date" v-model="user.subscriptionStartDate" required /><br />
+      <input
+        type="date"
+        v-model="user.subscriptionStartDate"
+        :max="maxInputDate()"
+        required
+      /><br />
       <label>Subscription End Date:</label>
-      <input type="date" v-model="user.subscriptionEndDate" /><br />
+      <input type="date" v-model="user.subscriptionEndDate" :max="maxInputDate()" /><br />
 
       <label>Start Date:</label>
-      <input type="date" v-model="user.startDate" required /><br />
+      <input type="date" v-model="user.startDate" :max="maxInputDate()" required /><br />
 
       <button type="submit">Create User</button>
     </form>
@@ -33,6 +38,7 @@ import { ref } from 'vue'
 import { collection, addDoc, getFirestore } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
 import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { maxInputDate } from '@/utils/functions'
 
 const db = getFirestore(firebaseApp)
 

@@ -21,6 +21,7 @@
           type="date"
           :value="formattedDate(subscription.startDate)"
           @input="updateDate($event.target.value, subscription, 'startDate')"
+          :max="maxInputDate()"
           required
         /><br />
         <label>Subscription End Date:</label>
@@ -28,6 +29,7 @@
           type="date"
           :value="formattedDate(subscription.endDate)"
           @input="updateDate($event.target.value, subscription, 'endDate')"
+          :max="maxInputDate()"
         /><br />
         <button type="button" @click="removeSubscription(index)">Remove Subscription</button>
         <hr />
@@ -46,6 +48,7 @@ import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
 import { useRoute } from 'vue-router'
 import { USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { maxInputDate } from '@/utils/functions'
 
 const db = getFirestore(firebaseApp)
 const route = useRoute()
@@ -60,8 +63,8 @@ onMounted(async () => {
     if (docSnap.exists()) {
       user.value = docSnap.data()
       user.value.subscriptionData.forEach((subscription) => {
-        subscription.startDate = subscription.startDate?.toDate()
-        subscription.endDate = subscription.endDate?.toDate()
+        subscription.startDate = subscription.startDate?.toDate() ?? null
+        subscription.endDate = subscription.endDate?.toDate() ?? null
       })
     } else {
       console.error('User not found')
