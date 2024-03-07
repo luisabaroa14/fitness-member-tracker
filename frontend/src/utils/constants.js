@@ -1,5 +1,6 @@
 export const USERS = 'users'
 export const PAYMENTS = 'payments'
+export const CLASSES = 'classes'
 
 export const SUBSCRIPTIONS = Object.freeze({
   0: {

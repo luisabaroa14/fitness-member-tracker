@@ -74,7 +74,7 @@ const addPayment = async () => {
     //   date: new Date(date.value + 'T00:00:00')
     // })
 
-    await addDoc(collection(db, PAYMENTS), {
+    const docRef = await addDoc(collection(db, PAYMENTS), {
       userId: userId.value,
       amount: amount.value,
       date: new Date(date.value + 'T00:00:00')
@@ -84,6 +84,7 @@ const addPayment = async () => {
 
     // Add payment to the local payments array
     payments.value.push({
+      id: docRef.id,
       userId: userId.value,
       amount: amount.value,
       date: new Date(date.value + 'T00:00:00')
@@ -100,7 +101,7 @@ const addPayment = async () => {
 
 const deletePayment = async (paymentId) => {
   try {
-    await deleteDoc(doc(db, 'payments', paymentId))
+    await deleteDoc(doc(db, PAYMENTS, paymentId))
     payments.value = payments.value.filter((payment) => payment.id !== paymentId)
     alert('Payment deleted successfully!')
   } catch (error) {

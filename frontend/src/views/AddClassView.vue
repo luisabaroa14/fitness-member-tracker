@@ -5,12 +5,44 @@
     <p>Next payment date: {{ calculateNextPaymentDate() }}</p>
     <p>Debt: ${{ user?.totalDebt }}</p>
   </div>
+  <h2>Add Class</h2>
+  <form @submit.prevent="addClass">
+    <label>Date:</label>
+    <input type="date" v-model="date" required :max="maxInputDate()" /><br />
+    <button type="submit">Add Class</button>
+  </form>
+  <h2>Classes</h2>
+  <div v-if="classes.length === 0">No classes available.</div>
+  <div v-else>
+    <p>Classes this week: {{ weekClasses.length }}</p>
+    <div v-if="latestSubscription?.type">
+      <p v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0">
+        Missing classes:
+        {{ SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length }}
+      </p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="c in classes" :key="c.id">
+          <td>{{ c.date?.toDateString() }}</td>
+          <td>
+            <button @click="deleteClass(c.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { PAYMENTS, USERS, SUBSCRIPTIONS } from '@/utils/constants'
+import { PAYMENTS, USERS, SUBSCRIPTIONS, CLASSES } from '@/utils/constants'
 import {
   getFirestore,
   collection,
@@ -18,24 +50,53 @@ import {
   orderBy,
   getDocs,
   getDoc,
+  addDoc,
+  deleteDoc,
   doc,
   where
 } from 'firebase/firestore'
 import firebaseApp from '@/utils/firebase'
+import { maxInputDate } from '@/utils/functions'
 
 const db = getFirestore(firebaseApp)
 const route = useRoute()
 
 const userId = ref(route.params.id)
 
-const payments = ref([])
 const user = ref(null)
+const payments = ref([])
+const classes = ref([])
+const date = ref('')
 const latestSubscription = ref(null)
 
 onMounted(async () => {
   await fetchUserPayments()
+  await fetchUserClasses()
   await fetchUser()
   setLatestSubscription()
+})
+
+const weekClasses = computed(() => {
+  // Get the current date
+  const today = new Date()
+  const currentDayOfWeek = today.getDay() // 0: Sunday, 1: Monday, ..., 6: Saturday
+
+  // Calculate the start date of the current week (Monday)
+  const startDate = new Date(today)
+  startDate.setDate(today.getDate() - (currentDayOfWeek - 1)) // Adjust for Monday
+  startDate.setHours(0, 0, 0, 0) // Set time to midnight
+
+  // Calculate the end date of the current week (Sunday)
+  const endDate = new Date(startDate)
+  endDate.setDate(startDate.getDate() + 6) // Add 6 days to get to Sunday
+  endDate.setHours(23, 59, 59, 999) // Set time to end of day (23:59:59)
+
+  // Assuming classes.value is your list of classes with dates
+  return classes.value.filter((c) => {
+    const classDate = new Date(c.date)
+    classDate.setHours(0, 0, 0, 0) // Set time to midnight for comparison
+    return classDate >= startDate && classDate <= endDate
+  })
 })
 
 const fetchUserPayments = async () => {
@@ -48,12 +109,31 @@ const fetchUserPayments = async () => {
 
     payments.value = querySnapshot.docs.map((doc) => {
       const payments = doc.data()
-      payments.date = payments.date.toDate()
+      payments.date = payments.date?.toDate()
       return { id: doc.id, ...payments }
     })
   } catch (error) {
     console.error('Error fetching payments: ', error.message)
     alert('An error occurred while fetching payments.')
+  }
+}
+
+const fetchUserClasses = async () => {
+  try {
+    const classessCollection = collection(db, CLASSES)
+
+    const querySnapshot = await getDocs(
+      query(classessCollection, where('userId', '==', userId.value), orderBy('date', 'desc'))
+    )
+
+    classes.value = querySnapshot.docs.map((doc) => {
+      const classes = doc.data()
+      classes.date = classes.date?.toDate()
+      return { id: doc.id, ...classes }
+    })
+  } catch (error) {
+    console.error('Error fetching classes: ', error.message)
+    alert('An error occurred while fetching classes.')
   }
 }
 
@@ -183,5 +263,43 @@ const getNextPaymentDate = (startDate) => {
   }
 
   return nextPaymentDate
+}
+
+const addClass = async () => {
+  try {
+    const docRef = await addDoc(collection(db, CLASSES), {
+      userId: userId.value,
+      date: new Date(date.value + 'T00:00:00')
+    })
+
+    alert('Class added successfully!')
+
+    // Add payment to the local classes array
+    classes.value.push({
+      id: docRef.id,
+      userId: userId.value,
+      date: new Date(date.value + 'T00:00:00')
+    })
+
+    // Sort the classes by date
+    classes.value.sort((a, b) => b.date - a.date)
+
+    // Clear the form after adding a class
+    date.value = ''
+  } catch (error) {
+    console.error('Error adding class: ', error.message)
+    alert('An error occurred while adding a class.')
+  }
+}
+
+const deleteClass = async (classId) => {
+  try {
+    await deleteDoc(doc(db, CLASSES, classId))
+    classes.value = classes.value.filter((c) => c.id !== classId)
+    alert('Class deleted successfully!')
+  } catch (error) {
+    console.error('Error deleting class: ', error.message)
+    alert('An error occurred while deleting class.')
+  }
 }
 </script>
