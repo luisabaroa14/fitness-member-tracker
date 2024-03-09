@@ -36,3 +36,6 @@ firebase.json
 
 
 .env
+
+LogInView.vue
+loginStatus.js
