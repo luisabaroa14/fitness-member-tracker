@@ -9,7 +9,7 @@
           <th>Name</th>
           <th>Email</th>
           <th>Start Date</th>
-          <th>Total Debt</th>
+          <th>Total Balance</th>
           <th>Subscriptions</th>
           <th>Actions</th>
         </tr>
@@ -20,15 +20,18 @@
           <td>{{ user.name }}</td>
           <td>{{ user.mail }}</td>
           <td>{{ user.startDate?.toDateString() }}</td>
-          <td>${{ user.totalDebt }}</td>
+          <td>${{ user.totalBalance }}</td>
           <td>
             <ul v-if="user.subscriptionData.length > 0">
               <li v-for="(subscription, index) in user.subscriptionData" :key="index">
                 <p>Type: {{ SUBSCRIPTIONS[subscription.type].name }}</p>
                 <p>Months: {{ subscription.diffMonths }}</p>
+                <p>
+                  Debt: ${{ subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount }}
+                </p>
                 <p>Paid: ${{ subscription.totalPaid }}</p>
                 <p>
-                  Debt: ${{
+                  Balance: ${{
                     subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
                     subscription.totalPaid
                   }}
@@ -89,7 +92,7 @@ const fetchUsers = async () => {
       const user = doc.data()
       user.startDate = user.startDate?.toDate()
 
-      let totalDebt = 0
+      let totalBalance = 0
 
       user.subscriptionData.forEach((subscription) => {
         subscription.startDate = subscription.startDate?.toDate()
@@ -118,14 +121,14 @@ const fetchUsers = async () => {
           )
 
           // Add the debt of the subscription to the total amount
-          totalDebt +=
+          totalBalance +=
             subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
             subscription.totalPaid
         }
       })
 
       // Set the total debt of the user
-      user.totalDebt = totalDebt
+      user.totalBalance = totalBalance
 
       users.value.push({ id: doc.id, ...user })
     })

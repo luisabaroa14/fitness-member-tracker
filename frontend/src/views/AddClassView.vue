@@ -3,7 +3,7 @@
     <h2>Set Class</h2>
     <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
     <p>Next payment date: {{ calculateNextPaymentDate() }}</p>
-    <p>Debt: ${{ user?.totalDebt }}</p>
+    <p>Balance: ${{ user?.totalBalance }}</p>
   </div>
   <h2>Add Class</h2>
   <form @submit.prevent="createClass">
@@ -125,7 +125,7 @@ const fetchUser = async () => {
     if (response) {
       const userData = { id: response.id, ...response.data() }
 
-      let totalDebt = 0
+      let totalBalance = 0
       userData.subscriptionData.forEach((subscription) => {
         subscription.startDate = subscription.startDate?.toDate() ?? null
         subscription.endDate = subscription.endDate?.toDate() ?? null
@@ -153,13 +153,13 @@ const fetchUser = async () => {
           )
 
           // Add the debt of the subscription to the total amount
-          totalDebt +=
+          totalBalance +=
             subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
             subscription.totalPaid
         }
       })
 
-      userData.totalDebt = totalDebt
+      userData.totalBalance = totalBalance
 
       user.value = userData
     } else {
