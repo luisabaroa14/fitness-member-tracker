@@ -1,20 +1,22 @@
 <template>
   <div>
-    <h2>Users</h2>
-    <table style="width: 100%">
+    <h2 style="margin-bottom: 10px">Users</h2>
+    <router-link to="/create-user">Create User</router-link>
+    <table class="w-100 h-100" style="margin-top: 20px">
       <thead>
         <tr>
-          <!-- <th>Id</th> -->
+          <th>Id</th>
           <th>Name</th>
           <th>Email</th>
           <th>Start Date</th>
           <th>Total Debt</th>
           <th>Subscriptions</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="user in users" :key="user.id">
-          <!-- <td>{{ user.id }}</td> -->
+          <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.mail }}</td>
           <td>{{ user.startDate?.toDateString() }}</td>
@@ -39,13 +41,17 @@
             </ul>
             <span v-else>No subscriptions</span>
           </td>
-          <router-link :to="{ name: 'edit-user', params: { id: user.id } }"> Edit </router-link>
-          <router-link :to="{ name: 'add-payment', params: { id: user.id } }">
-            Add payment
-          </router-link>
-          <router-link :to="{ name: 'add-class', params: { id: user.id } }">
-            Add class
-          </router-link>
+          <td>
+            <div class="router-links">
+              <router-link :to="{ name: 'edit-user', params: { id: user.id } }"> Edit </router-link>
+              <router-link :to="{ name: 'add-payment', params: { id: user.id } }">
+                Add payment
+              </router-link>
+              <router-link :to="{ name: 'add-class', params: { id: user.id } }">
+                Add class
+              </router-link>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -134,3 +140,50 @@ onMounted(async () => {
   await fetchUsers()
 })
 </script>
+
+<style scoped>
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td,
+li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+thead th {
+  background-color: #000000;
+}
+
+tfoot td {
+  border-top: 2px solid #333;
+  font-weight: bold;
+}
+
+.total-label {
+  text-align: right;
+}
+
+.total-amount {
+  text-align: center;
+}
+
+.router-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.router-link {
+  margin-bottom: 8px;
+  font-size: 16px;
+  /* Add other styles as needed */
+}
+</style>
