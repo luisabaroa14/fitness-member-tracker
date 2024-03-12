@@ -1,41 +1,44 @@
 <template>
   <div>
-    <h2>Set Class</h2>
-    <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
-    <p>Next payment date: {{ calculateNextPaymentDate() }}</p>
-    <p>Balance: ${{ user?.totalBalance }}</p>
-  </div>
-  <h2>Add Class</h2>
-  <form @submit.prevent="createClass">
-    <label>Date:</label>
-    <input type="date" v-model="date" required :max="maxInputDate()" /><br />
-    <button type="submit">Add Class</button>
-  </form>
-  <h2>Classes</h2>
-  <div v-if="classes.length === 0">No classes available.</div>
-  <div v-else>
-    <p>Classes this week: {{ weekClasses.length }}</p>
-    <div v-if="latestSubscription?.type">
-      <p v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0">
-        Missing classes:
-        {{ SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length }}
-      </p>
+    <div class="center-item">
+      <h2>Set Class</h2>
+      <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
+      <p>Next payment date: {{ calculateNextPaymentDate() }}</p>
+      <p>Balance: ${{ user?.totalBalance }}</p>
+      <h2 class="mt-1">Add Class</h2>
+      <form @submit.prevent="createClass">
+        <label>Date:</label>
+        <input type="date" v-model="date" required :max="maxInputDate()" /><br />
+        <button class="w-100" type="submit">Add Class</button>
+      </form>
+      <h2 class="mt-1">Classes</h2>
+      <div v-if="classes.length === 0">No classes available.</div>
+      <div class="mb-1" v-else>
+        <p class="center-text">Classes this week: {{ weekClasses.length }}</p>
+        <div v-if="latestSubscription?.type">
+          <p v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0" class="center-text">
+            Missing classes:
+            {{ SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length }}
+          </p>
+        </div>
+      </div>
+      <table class="mt">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="c in classes" :key="c.id">
+            <td>{{ c.date?.toDateString() }}</td>
+            <td>
+              <button @click="removeClass(c.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="c in classes" :key="c.id">
-          <td>{{ c.date?.toDateString() }}</td>
-          <td>
-            <button @click="removeClass(c.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 

@@ -1,14 +1,15 @@
 <template>
   <div>
-    <h2>Add Payment</h2>
-    <form @submit.prevent="createPayment">
-      <label>Amount:</label>
-      <input type="number" v-model.number="amount" required /><br />
-      <label>Date:</label>
-      <input type="date" v-model="date" required :max="maxInputDate()" /><br />
-      <button type="submit">Add Payment</button>
-    </form>
-
+    <div class="center-item">
+      <h2>Add Payment</h2>
+      <form @submit.prevent="createPayment">
+        <label>Amount:</label>
+        <input class="w-100 mb-1" type="number" v-model.number="amount" required /><br />
+        <label>Date:</label>
+        <input class="w-100 mb-1" type="date" v-model="date" required :max="maxInputDate()" /><br />
+        <button class="w-100" type="submit">Add Payment</button>
+      </form>
+    </div>
     <h2>Payments</h2>
     <div v-if="payments.length === 0">No payments available.</div>
     <div v-else>

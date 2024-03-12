@@ -1,44 +1,50 @@
 <template>
   <div>
-    <h2>Edit User</h2>
-    <form @submit.prevent="updateUserData">
-      <label>Name:</label>
-      <input type="text" v-model="user.name" required /><br />
-      <label>Email:</label>
-      <input type="email" v-model="user.mail" required /><br />
-      <hr />
+    <div class="center-item">
+      <h2>Edit User</h2>
+      <form @submit.prevent="updateUserData">
+        <label>Name:</label>
+        <input class="w-100 mb-1" type="text" v-model="user.name" required /><br />
+        <label>Email:</label>
+        <input class="w-100 mb-1" type="email" v-model="user.mail" required /><br />
+        <hr class="mb-1" />
 
-      <!-- Subscription Data -->
-      <div v-for="(subscription, index) in user.subscriptionData" :key="index">
-        <label>Subscription Type:</label>
-        <select v-model="subscription.type">
-          <option v-for="(subscriptionType, key) in SUBSCRIPTIONS" :value="key" :key="key">
-            {{ subscriptionType.name }}
-          </option></select
-        ><br />
-        <label>Subscription Start Date:</label>
-        <input
-          type="date"
-          :value="formattedDate(subscription.startDate)"
-          @input="updateDate($event.target.value, subscription, 'startDate')"
-          :max="maxInputDate()"
-          required
-        /><br />
-        <label>Subscription End Date:</label>
-        <input
-          type="date"
-          :value="formattedDate(subscription.endDate)"
-          @input="updateDate($event.target.value, subscription, 'endDate')"
-          :max="maxInputDate()"
-        /><br />
-        <button type="button" @click="removeSubscription(index)">Remove Subscription</button>
-        <hr />
-      </div>
+        <!-- Subscription Data -->
+        <div v-for="(subscription, index) in user.subscriptionData" :key="index">
+          <label>Subscription Type:</label>
+          <select class="w-100 mb-1" v-model="subscription.type">
+            <option v-for="(subscriptionType, key) in SUBSCRIPTIONS" :value="key" :key="key">
+              {{ subscriptionType.name }}
+            </option></select
+          ><br />
+          <label>Subscription Start Date:</label>
+          <input
+            class="w-100 mb-1"
+            type="date"
+            :value="formattedDate(subscription.startDate)"
+            @input="updateDate($event.target.value, subscription, 'startDate')"
+            :max="maxInputDate()"
+            required
+          /><br />
+          <label>Subscription End Date:</label>
+          <input
+            class="w-100 mb-1"
+            type="date"
+            :value="formattedDate(subscription.endDate)"
+            @input="updateDate($event.target.value, subscription, 'endDate')"
+            :max="maxInputDate()"
+          /><br />
+          <button class="w-100" type="button" @click="removeSubscription(index)">
+            Remove Subscription
+          </button>
+          <hr class="mb-1" />
+        </div>
 
-      <button type="button" @click="addSubscription">Add Subscription</button>
+        <button class="w-100" type="button" @click="addSubscription">Add Subscription</button>
 
-      <button type="submit">Save Changes</button>
-    </form>
+        <button class="w-100" type="submit">Save Changes</button>
+      </form>
+    </div>
   </div>
 </template>
 

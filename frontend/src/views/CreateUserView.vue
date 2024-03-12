@@ -1,35 +1,49 @@
 <template>
   <div>
-    <h2>Create User</h2>
-    <form @submit.prevent="createUser">
-      <label>Name:</label>
-      <input type="text" v-model="user.name" required /><br />
-      <label>Email:</label>
-      <input type="email" v-model="user.mail" required /><br />
+    <div class="center-item">
+      <h2>Create User</h2>
+      <form @submit.prevent="createUser">
+        <label>Name:</label>
+        <input class="w-100 mb-1" type="text" v-model="user.name" required /><br />
+        <label>Email:</label>
+        <input class="w-100 mb-1" type="email" v-model="user.mail" required /><br />
 
-      <!-- Subscription Data -->
-      <label>Subscription Type:</label>
-      <select v-model="user.subscriptionType">
-        <option v-for="(subscription, key) in SUBSCRIPTIONS" :value="key" :key="key">
-          {{ subscription.name }}
-        </option></select
-      ><br />
+        <!-- Subscription Data -->
+        <label>Subscription Type:</label>
+        <select class="w-100 mb-1" v-model="user.subscriptionType">
+          <option v-for="(subscription, key) in SUBSCRIPTIONS" :value="key" :key="key">
+            {{ subscription.name }}
+          </option></select
+        ><br />
 
-      <label>Subscription Start Date:</label>
-      <input
-        type="date"
-        v-model="user.subscriptionStartDate"
-        :max="maxInputDate()"
-        required
-      /><br />
-      <label>Subscription End Date:</label>
-      <input type="date" v-model="user.subscriptionEndDate" :max="maxInputDate()" /><br />
+        <label>Subscription Start Date:</label>
+        <input
+          class="w-100 mb-1"
+          type="date"
+          v-model="user.subscriptionStartDate"
+          :max="maxInputDate()"
+          required
+        /><br />
+        <label>Subscription End Date:</label>
+        <input
+          class="w-100 mb-1"
+          type="date"
+          v-model="user.subscriptionEndDate"
+          :max="maxInputDate()"
+        /><br />
 
-      <label>Start Date:</label>
-      <input type="date" v-model="user.startDate" :max="maxInputDate()" required /><br />
+        <label>Start Date:</label>
+        <input
+          class="w-100 mb-1"
+          type="date"
+          v-model="user.startDate"
+          :max="maxInputDate()"
+          required
+        /><br />
 
-      <button type="submit">Create User</button>
-    </form>
+        <button class="w-100" type="submit">Create User</button>
+      </form>
+    </div>
   </div>
 </template>
 
