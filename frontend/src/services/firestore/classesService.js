@@ -49,3 +49,16 @@ export const getUserClasses = async (userId) => {
     throw error
   }
 }
+
+export const getClasses = async () => {
+  try {
+    const classesCollection = collection(db, CLASSES)
+
+    const querySnapshot = await getDocs(query(classesCollection, orderBy('date', 'desc')))
+
+    return querySnapshot
+  } catch (error) {
+    console.error('Error fetching classes: ', error.message)
+    throw error
+  }
+}

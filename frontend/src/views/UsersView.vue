@@ -2,6 +2,7 @@
   <div>
     <h2 style="margin-bottom: 10px">Users</h2>
     <router-link to="/create-user">Create User</router-link>
+    <button style="margin-left: 20px" @click="exportData">Export Data</button>
     <table class="w-100 h-100" style="margin-top: 20px">
       <thead>
         <tr>
@@ -66,9 +67,11 @@ import { ref, onMounted } from 'vue'
 import { SUBSCRIPTIONS } from '@/utils/constants'
 import { getUsers } from '@/services/firestore/usersService'
 import { getPayments } from '@/services/firestore/paymentsService'
+import { getClasses } from '@/services/firestore/classesService'
 
 const users = ref([])
 const payments = ref([])
+const classes = ref([])
 
 const fetchPayments = async () => {
   try {
@@ -138,13 +141,95 @@ const fetchUsers = async () => {
   }
 }
 
+const fetchClasses = async () => {
+  try {
+    const querySnapshot = await getClasses()
+
+    classes.value = querySnapshot.docs.map((doc) => {
+      const c = doc.data()
+      c.date = c.date.toDate()
+      return { id: doc.id, ...c }
+    })
+  } catch (error) {
+    console.error('Error fetching classes: ', error.message)
+    alert('An error occurred while fetching classes.')
+  }
+}
+
+const exportData = () => {
+  // Prepare combined data
+  const combinedData = {
+    users: [],
+    payments: [],
+    classes: []
+  }
+  // Add user data
+  users.value.forEach((user) => {
+    const mappedUser = {
+      id: user.id,
+      name: user.name,
+      mail: user.mail,
+      startDate: user.startDate,
+      subscriptionData: user.subscriptionData.map((subscription) => {
+        return {
+          type: SUBSCRIPTIONS[subscription.type].name,
+          startDate: subscription.startDate,
+          endDate: subscription.endDate,
+          // Extra subscription data
+          subscriptionName: SUBSCRIPTIONS[subscription.type].name,
+          diffMonths: subscription.diffMonths,
+          totalPaid: subscription.totalPaid,
+          balance:
+            subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
+            subscription.totalPaid
+        }
+      }),
+      // Extra user data
+      totalBalance: user.totalBalance
+    }
+    combinedData.users.push(mappedUser)
+  })
+
+  // Add payment data
+  payments.value.forEach((payment) => {
+    combinedData.payments.push({
+      userId: payment.userId,
+      amount: payment.amount,
+      date: payment.paymentDate
+    })
+  })
+
+  // Add classes data
+  classes.value.forEach((c) => {
+    combinedData.classes.push({
+      userId: c.userId,
+      date: c.date
+    })
+  })
+
+  // Convert data to JSON format
+  const jsonData = JSON.stringify(combinedData, null, 2)
+
+  // Create a Blob object
+  const blob = new Blob([jsonData], { type: 'application/json' })
+
+  // Create download link
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', 'data.json')
+  document.body.appendChild(link)
+  link.click()
+}
+
 onMounted(async () => {
   await fetchPayments()
   await fetchUsers()
+  await fetchClasses()
 })
 </script>
 
-<style scoped>
+<style>
 .table-container {
   overflow-x: auto;
 }
