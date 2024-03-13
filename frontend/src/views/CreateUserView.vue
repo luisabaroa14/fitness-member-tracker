@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LogoIcon />
     <div class="center-item">
       <h2>Create User</h2>
       <form @submit.prevent="createUser">
@@ -52,6 +53,7 @@ import { ref } from 'vue'
 import { addUser } from '@/services/firestore/usersService'
 import { SUBSCRIPTIONS } from '@/utils/constants'
 import { maxInputDate } from '@/utils/functions'
+import LogoIcon from '@/components/LogoIcon.vue'
 
 const user = ref({
   name: '',

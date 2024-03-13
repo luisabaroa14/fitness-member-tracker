@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LogoIcon />
     <div class="center-item">
       <h2>Edit User</h2>
       <form @submit.prevent="updateUserData">
@@ -54,6 +55,7 @@ import { getUser, updateUser } from '@/services/firestore/usersService'
 import { useRoute } from 'vue-router'
 import { SUBSCRIPTIONS } from '@/utils/constants'
 import { maxInputDate } from '@/utils/functions'
+import LogoIcon from '@/components/LogoIcon.vue'
 
 const route = useRoute()
 

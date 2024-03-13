@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LogoIcon />
     <div class="center-item">
       <h2>Add Payment</h2>
       <form @submit.prevent="createPayment">
@@ -40,6 +41,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { addPayment, deletePayment, getUserPayments } from '@/services/firestore/paymentsService'
 import { maxInputDate } from '@/utils/functions'
+import LogoIcon from '@/components/LogoIcon.vue';
 
 const route = useRoute()
 const userId = ref(route.params.id)

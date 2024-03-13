@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LogoIcon />
     <div class="center-item">
       <h2>Set Class</h2>
       <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
@@ -50,6 +51,7 @@ import { getUser } from '@/services/firestore/usersService'
 import { getUserPayments } from '@/services/firestore/paymentsService'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
 import { maxInputDate } from '@/utils/functions'
+import LogoIcon from '@/components/LogoIcon.vue'
 
 const route = useRoute()
 
