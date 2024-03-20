@@ -2,11 +2,18 @@
   <div>
     <LogoIcon />
     <div class="center-item">
-      <h2>Set Class</h2>
+      <h1>Add Class</h1>
       <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
-      <p>Next payment date: {{ calculateNextPaymentDate() }}</p>
-      <p>Balance: ${{ user?.totalBalance }}</p>
-      <h2 class="mt-1">Add Class</h2>
+      <qrcode-vue
+        class="w-100"
+        style="margin: 20px 0; padding: 10px; border: 3px solid hsla(160, 100%, 37%, 1)"
+        :value="link"
+        :size="300"
+        
+      ></qrcode-vue>
+      <h3>Balance: ${{ user?.totalBalance }}</h3>
+      <h3>Next payment date: {{ calculateNextPaymentDate() }}</h3>
+      <h2 class="mt-1">Class Details</h2>
       <form @submit.prevent="createClass">
         <label>Type:</label>
         <select required class="w-100 mb-1" v-model="type">
@@ -22,12 +29,12 @@
       </form>
       <h2 class="mt-1">Classes</h2>
       <div class="mb-1">
-        <p class="center-text">Classes this week: {{ weekClasses.length }}</p>
+        <h3 class="center-text">Classes this week: {{ weekClasses.length }}</h3>
         <div v-if="latestSubscription?.type">
-          <p v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0" class="center-text">
+          <h3 v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0" class="center-text">
             Missing classes:
             {{ SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length }}
-          </p>
+          </h3>
         </div>
       </div>
       <table class="mt">
@@ -61,9 +68,11 @@ import { getUserPayments } from '@/services/firestore/paymentsService'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
 import { maxInputDate, formatDate } from '@/utils/functions'
 import LogoIcon from '@/components/LogoIcon.vue'
+import QrcodeVue from 'qrcode.vue'
 
 const route = useRoute()
 
+const link = ref(window.location.href)
 const userId = ref(route.params.id)
 
 const user = ref(null)
@@ -73,6 +82,17 @@ const date = ref('')
 const time = ref('')
 const latestSubscription = ref(null)
 const type = ref(null)
+
+// QR code options
+const qrOptions = {
+  width: 500,
+  height: 500,
+  margin: 0,
+  color: {
+    dark: '#000000',
+    light: '#ffffff'
+  }
+}
 
 onMounted(async () => {
   await fetchUserPayments()
