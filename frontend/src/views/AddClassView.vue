@@ -8,13 +8,20 @@
       <p>Balance: ${{ user?.totalBalance }}</p>
       <h2 class="mt-1">Add Class</h2>
       <form @submit.prevent="createClass">
+        <label>Type:</label>
+        <select required class="w-100 mb-1" v-model="type">
+          <option v-for="(type, key) in CLASS_TYPES" :value="key" :key="key">
+            {{ type.name }}
+          </option>
+        </select>
         <label>Date:</label>
-        <input type="date" v-model="date" required :max="maxInputDate()" /><br />
+        <input type="date" v-model="date" class="w-100 mb-1" required :max="maxInputDate()" /><br />
+        <label>Time:</label>
+        <input type="time" v-model="time" class="w-100 mb-1" required /><br />
         <button class="w-100" type="submit">Add Class</button>
       </form>
       <h2 class="mt-1">Classes</h2>
-      <div v-if="classes.length === 0">No classes available.</div>
-      <div class="mb-1" v-else>
+      <div class="mb-1">
         <p class="center-text">Classes this week: {{ weekClasses.length }}</p>
         <div v-if="latestSubscription?.type">
           <p v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0" class="center-text">
@@ -27,12 +34,14 @@
         <thead>
           <tr>
             <th>Date</th>
+            <th>Type</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="c in classes" :key="c.id">
-            <td>{{ c.date?.toDateString() }}</td>
+            <td>{{ formatDate(c.date) }}</td>
+            <td>{{ CLASS_TYPES[c.type]?.name }}</td>
             <td>
               <button @click="removeClass(c.id)">Delete</button>
             </td>
@@ -46,11 +55,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { SUBSCRIPTIONS } from '@/utils/constants'
+import { SUBSCRIPTIONS, CLASS_TYPES } from '@/utils/constants'
 import { getUser } from '@/services/firestore/usersService'
 import { getUserPayments } from '@/services/firestore/paymentsService'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
-import { maxInputDate } from '@/utils/functions'
+import { maxInputDate, formatDate } from '@/utils/functions'
 import LogoIcon from '@/components/LogoIcon.vue'
 
 const route = useRoute()
@@ -61,7 +70,9 @@ const user = ref(null)
 const payments = ref([])
 const classes = ref([])
 const date = ref('')
+const time = ref('')
 const latestSubscription = ref(null)
+const type = ref(null)
 
 onMounted(async () => {
   await fetchUserPayments()
@@ -139,9 +150,14 @@ const fetchUser = async () => {
         let endDate = subscription.endDate ? new Date(subscription.endDate) : new Date()
 
         // Calculate the difference in months
-        const diffMonths =
+        let diffMonths =
           (endDate.getFullYear() - startDate.getFullYear()) * 12 +
           (endDate.getMonth() - startDate.getMonth())
+
+        // Check if the start date is after the beginning of the month
+        if (endDate.getDate() >= startDate.getDate()) {
+          diffMonths++ // Increment month difference by one
+        }
 
         subscription.diffMonths = diffMonths
 
@@ -252,7 +268,9 @@ const getNextPaymentDate = (startDate) => {
 
 const createClass = async () => {
   try {
-    const docRef = await addClass(userId.value, date.value)
+    const datetime = new Date(`${date.value}T${time.value}`)
+
+    const docRef = await addClass(userId.value, datetime, type.value)
 
     alert('Class added successfully!')
 
@@ -260,7 +278,7 @@ const createClass = async () => {
     classes.value.push({
       id: docRef.id,
       userId: userId.value,
-      date: new Date(date.value + 'T00:00:00')
+      date: new Date(`${date.value}T${time.value}`)
     })
 
     // Sort the classes by date

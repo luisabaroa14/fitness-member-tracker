@@ -14,11 +14,12 @@ import { CLASSES } from '@/utils/constants'
 
 const db = getFirestore(firebaseApp)
 
-export const addClass = async (userId, date) => {
+export const addClass = async (userId, datetime, type) => {
   try {
     const docRef = await addDoc(collection(db, CLASSES), {
       userId: userId,
-      date: new Date(date + 'T00:00:00')
+      type: type,
+      date: new Date(datetime)
     })
     return docRef
   } catch (error) {

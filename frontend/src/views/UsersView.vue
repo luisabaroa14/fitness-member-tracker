@@ -105,9 +105,14 @@ const fetchUsers = async () => {
         let endDate = subscription.endDate ? new Date(subscription.endDate) : new Date()
 
         // Calculate the difference in months
-        const diffMonths =
+        let diffMonths =
           (endDate.getFullYear() - startDate.getFullYear()) * 12 +
           (endDate.getMonth() - startDate.getMonth())
+
+        // Check if the start date is after the beginning of the month
+        if (endDate.getDate() >= startDate.getDate()) {
+          diffMonths++ // Increment month difference by one
+        }
 
         subscription.diffMonths = diffMonths
 

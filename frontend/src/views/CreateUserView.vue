@@ -14,8 +14,9 @@
         <select class="w-100 mb-1" v-model="user.subscriptionType">
           <option v-for="(subscription, key) in SUBSCRIPTIONS" :value="key" :key="key">
             {{ subscription.name }}
-          </option></select
-        ><br />
+          </option>
+        </select>
+        <br />
 
         <label>Subscription Start Date:</label>
         <input
