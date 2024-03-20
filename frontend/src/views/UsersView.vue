@@ -2,7 +2,8 @@
   <div>
     <h2 style="margin-bottom: 10px">Users</h2>
     <router-link to="/create-user">Create User</router-link>
-    <button style="margin-left: 20px" @click="exportData">Export Data</button>
+    <button style="margin: 0px 20px" @click="exportData">Export Data</button>
+    <input type="text" v-model="searchInput" placeholder="Search" />
     <table class="w-100 h-100" style="margin-top: 20px">
       <thead>
         <tr>
@@ -16,7 +17,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id">
+        <tr
+          v-for="user in users.filter(
+            (u) =>
+              u.name.toLowerCase().includes(searchQuery) ||
+              u.mail.toLowerCase().includes(searchQuery) ||
+              u.id.toLowerCase().includes(searchQuery)
+          )"
+          :key="user.id"
+        >
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.mail }}</td>
@@ -63,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { SUBSCRIPTIONS } from '@/utils/constants'
 import { getUsers } from '@/services/firestore/usersService'
 import { getPayments } from '@/services/firestore/paymentsService'
@@ -72,6 +81,16 @@ import { getClasses } from '@/services/firestore/classesService'
 const users = ref([])
 const payments = ref([])
 const classes = ref([])
+
+// Define a ref for the search query
+const searchQuery = ref('')
+
+const searchInput = computed({
+  get: () => searchQuery.value,
+  set: (newValue) => {
+    searchQuery.value = newValue.toLowerCase()
+  }
+})
 
 const fetchPayments = async () => {
   try {
