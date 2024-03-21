@@ -27,7 +27,7 @@
             <td>${{ payment.amount }}</td>
             <td>{{ payment.date?.toDateString() }}</td>
             <td>
-              <button @click="removePayment(payment.id)">Delete</button>
+              <button class="danger" @click="removePayment(payment.id)">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -40,8 +40,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { addPayment, deletePayment, getUserPayments } from '@/services/firestore/paymentsService'
-import { maxInputDate } from '@/utils/functions'
-import LogoIcon from '@/components/LogoIcon.vue';
+import { maxInputDate, confirmDelete } from '@/utils/functions'
+import LogoIcon from '@/components/LogoIcon.vue'
 
 const route = useRoute()
 const userId = ref(route.params.id)
@@ -79,6 +79,8 @@ const createPayment = async () => {
 
 const removePayment = async (paymentId) => {
   try {
+    if (!confirmDelete()) return
+
     await deletePayment(paymentId)
     payments.value = payments.value.filter((payment) => payment.id !== paymentId)
     alert('Payment deleted successfully!')

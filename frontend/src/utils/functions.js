@@ -19,3 +19,15 @@ export const formatDate = (date) => {
   }
   return new Date(date).toLocaleDateString('en-US', options)
 }
+
+/*
+ * Dialog to confirm delete action.
+ * @returns {boolean} - True if user confirms delete, false otherwise.
+ */
+export const confirmDelete = () => {
+  if (confirm('Are you sure you want to delete?')) {
+    return true
+  } else {
+    return false
+  }
+}

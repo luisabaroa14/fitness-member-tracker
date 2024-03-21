@@ -6,7 +6,8 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  getFirestore
+  getFirestore,
+  deleteDoc
 } from 'firebase/firestore'
 import { USERS } from '@/utils/constants'
 
@@ -69,6 +70,15 @@ export const getUsers = async () => {
     return querySnapshot
   } catch (error) {
     console.error('Error fetching users: ', error.message)
+    throw error
+  }
+}
+
+export const deleteUser = async (userId) => {
+  try {
+    await deleteDoc(doc(db, USERS, userId))
+  } catch (error) {
+    console.error('Error deleting user: ', error.message)
     throw error
   }
 }

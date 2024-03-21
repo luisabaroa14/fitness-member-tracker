@@ -50,7 +50,7 @@
             <td>{{ formatDate(c.date) }}</td>
             <td>{{ CLASS_TYPES[c.type]?.name }}</td>
             <td>
-              <button @click="removeClass(c.id)">Delete</button>
+              <button class="danger" @click="removeClass(c.id)">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -66,7 +66,7 @@ import { SUBSCRIPTIONS, CLASS_TYPES } from '@/utils/constants'
 import { getUser } from '@/services/firestore/usersService'
 import { getUserPayments } from '@/services/firestore/paymentsService'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
-import { maxInputDate, formatDate } from '@/utils/functions'
+import { maxInputDate, formatDate, confirmDelete } from '@/utils/functions'
 import LogoIcon from '@/components/LogoIcon.vue'
 import QrcodeVue from 'qrcode.vue'
 
@@ -314,6 +314,9 @@ const createClass = async () => {
 
 const removeClass = async (classId) => {
   try {
+    if (!confirmDelete()) return
+
+
     await deleteClass(classId)
     classes.value = classes.value.filter((c) => c.id !== classId)
     alert('Class deleted successfully!')

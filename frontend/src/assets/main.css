@@ -22,8 +22,13 @@ button {
   margin: 0.5rem 0;
   border: none;
   border-radius: 5px;
-  background-color: hsla(160, 100%, 37%, 1);
+  background-color: rgb(0, 189, 126);
   transition: 0.4s;
+}
+
+.danger {
+  background-color: rgb(184, 0, 0);
+  color: white;
 }
 
 .center-item {
@@ -36,27 +41,26 @@ button {
   margin: 0;
 }
 
-.w-100{
+.w-100 {
   width: 100%;
 }
 
-.h-100{
+.h-100 {
   height: 100%;
 }
 
-.mt-1{
+.mt-1 {
   margin-top: 1rem;
 }
 
-.mb-1{
+.mb-1 {
   margin-bottom: 1rem;
 }
 
-.mt{
+.mt {
   margin-top: 0.5rem;
 }
 
 .center-text {
   text-align: center;
 }
-

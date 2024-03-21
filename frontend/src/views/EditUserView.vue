@@ -43,7 +43,11 @@
 
         <button class="w-100" type="button" @click="addSubscription">Add Subscription</button>
 
-        <button class="w-100" type="submit">Save Changes</button>
+        <button class="w-100 mt-1" type="submit">Save Changes</button>
+
+        <button class="w-100 danger" style="margin-top: 40px" type="button" @click="removeUser">
+          Delete User
+        </button>
       </form>
     </div>
   </div>
@@ -51,13 +55,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getUser, updateUser } from '@/services/firestore/usersService'
-import { useRoute } from 'vue-router'
+import { getUser, updateUser, deleteUser } from '@/services/firestore/usersService'
+import { useRoute, useRouter } from 'vue-router'
 import { SUBSCRIPTIONS } from '@/utils/constants'
-import { maxInputDate } from '@/utils/functions'
+import { maxInputDate, confirmDelete } from '@/utils/functions'
 import LogoIcon from '@/components/LogoIcon.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const userId = ref(route.params.id)
 const user = ref({})
@@ -98,6 +103,21 @@ const updateUserData = async () => {
   } catch (error) {
     console.error('Error updating user: ', error.message)
     alert('An error occurred while updating user.')
+  }
+}
+
+const removeUser = async () => {
+  try {
+    if (!confirmDelete()) return
+
+    await deleteUser(userId.value)
+    alert('User deleted successfully!')
+
+    // Redirect to the users list after deleting the user
+    router.push({ name: 'users' })
+  } catch (error) {
+    console.error('Error deleting user: ', error.message)
+    alert('An error occurred while deleting the user.')
   }
 }
 
