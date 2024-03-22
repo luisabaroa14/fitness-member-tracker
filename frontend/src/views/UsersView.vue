@@ -11,7 +11,7 @@
           <th>Name</th>
           <th>Email</th>
           <th>Start Date</th>
-          <th>Total Balance</th>
+          <th>Total</th>
           <th>Subscriptions</th>
           <th>Actions</th>
         </tr>
@@ -30,7 +30,13 @@
           <td>{{ user.name }}</td>
           <td>{{ user.mail }}</td>
           <td>{{ user.startDate?.toDateString() }}</td>
-          <td>${{ user.totalBalance }}</td>
+          <td>
+            <ul>
+              <li>Paid: ${{ user.totalPaid }}</li>
+              <li>Inscriptions: ${{ user.totalInscriptionPayments }}</li>
+              <li>Balance: ${{ user.totalBalance }}</li>
+            </ul>
+          </td>
           <td>
             <ul v-if="user.subscriptionData.length > 0">
               <li v-for="(subscription, index) in user.subscriptionData" :key="index">
@@ -41,9 +47,12 @@
                 </p>
                 <p>Paid: ${{ subscription.totalPaid }}</p>
                 <p>
+                  Discount: ${{ subscription.totalPaidWithoutDiscount - subscription.totalPaid }}
+                </p>
+                <p>
                   Balance: ${{
                     subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
-                    subscription.totalPaid
+                    subscription.totalPaidWithoutDiscount
                   }}
                 </p>
                 <p>
@@ -73,7 +82,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { SUBSCRIPTIONS } from '@/utils/constants'
+import { SUBSCRIPTIONS, PAYMENT_TYPES } from '@/utils/constants'
 import { getUsers } from '@/services/firestore/usersService'
 import { getPayments } from '@/services/firestore/paymentsService'
 import { getClasses } from '@/services/firestore/classesService'
@@ -115,6 +124,7 @@ const fetchUsers = async () => {
       user.startDate = user.startDate?.toDate()
 
       let totalBalance = 0
+      let totalPaid = 0
 
       user.subscriptionData.forEach((subscription) => {
         subscription.startDate = subscription.startDate?.toDate()
@@ -138,24 +148,47 @@ const fetchUsers = async () => {
         if (payments.value) {
           // Get the payments for the current subscription
           const subscriptionPayments = payments.value.filter((payment) => {
-            return payment.date >= startDate && payment.date <= endDate && payment.userId === doc.id
+            return (
+              payment.date >= startDate &&
+              payment.date <= endDate &&
+              payment.userId === doc.id &&
+              payment.type == PAYMENT_TYPES[0].type
+            )
           })
 
-          // Calculate the total amount paid for the current subscription
-          subscription.totalPaid = subscriptionPayments.reduce(
-            (acc, payment) => acc + payment.amount,
-            0
+          // Calculate the total amount paid for the subscription
+          const amountPaid = subscriptionPayments.reduce(
+            (acc, payment) => {
+              acc.withoutDiscount += payment.amount
+              acc.withDiscount += payment.amount * (1 - payment.discount / 100)
+              return acc
+            },
+            { withoutDiscount: 0, withDiscount: 0 }
           )
+
+          // Set the total amount paid for the subscription
+          subscription.totalPaid = amountPaid.withDiscount
+          subscription.totalPaidWithoutDiscount = amountPaid.withoutDiscount
+
+          // Add the amount paid of the subscription to the total amount paid
+          totalPaid += subscription.totalPaid
 
           // Add the debt of the subscription to the total amount
           totalBalance +=
             subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
-            subscription.totalPaid
+            subscription.totalPaidWithoutDiscount
         }
       })
 
-      // Set the total debt of the user
+      // Set the total balance and amount paid of the user
       user.totalBalance = totalBalance
+      user.totalPaid = totalPaid
+
+      const totalInscriptionPayments = payments.value
+        .filter((p) => p.userId === doc.id && p.type == PAYMENT_TYPES[1].type)
+        .reduce((total, payment) => total + payment.amount * (1 - payment.discount / 100), 0)
+
+      user.totalInscriptionPayments = totalInscriptionPayments ?? 0
 
       users.value.push({ id: doc.id, ...user })
     })
@@ -196,9 +229,9 @@ const exportData = () => {
       startDate: user.startDate,
       subscriptionData: user.subscriptionData.map((subscription) => {
         return {
-          type: SUBSCRIPTIONS[subscription.type].name,
+          type: SUBSCRIPTIONS[subscription.type].type,
           startDate: subscription.startDate,
-          endDate: subscription.endDate,
+          endDate: subscription.endDate ?? null,
           // Extra subscription data
           subscriptionName: SUBSCRIPTIONS[subscription.type].name,
           diffMonths: subscription.diffMonths,
@@ -219,7 +252,9 @@ const exportData = () => {
     combinedData.payments.push({
       userId: payment.userId,
       amount: payment.amount,
-      date: payment.paymentDate
+      type: payment.type,
+      discount: payment.discount,
+      date: payment.date
     })
   })
 
@@ -227,6 +262,7 @@ const exportData = () => {
   classes.value.forEach((c) => {
     combinedData.classes.push({
       userId: c.userId,
+      type: c.type,
       date: c.date
     })
   })

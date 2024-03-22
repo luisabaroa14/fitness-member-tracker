@@ -9,7 +9,6 @@
         style="margin: 20px 0; padding: 10px; border: 3px solid hsla(160, 100%, 37%, 1)"
         :value="link"
         :size="300"
-        
       ></qrcode-vue>
       <h3>Balance: ${{ user?.totalBalance }}</h3>
       <h3>Next payment date: {{ calculateNextPaymentDate() }}</h3>
@@ -62,7 +61,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { SUBSCRIPTIONS, CLASS_TYPES } from '@/utils/constants'
+import { SUBSCRIPTIONS, CLASS_TYPES, PAYMENT_TYPES } from '@/utils/constants'
 import { getUser } from '@/services/firestore/usersService'
 import { getUserPayments } from '@/services/firestore/paymentsService'
 import { addClass, getUserClasses, deleteClass } from '@/services/firestore/classesService'
@@ -81,18 +80,7 @@ const classes = ref([])
 const date = ref('')
 const time = ref('')
 const latestSubscription = ref(null)
-const type = ref(null)
-
-// QR code options
-const qrOptions = {
-  width: 500,
-  height: 500,
-  margin: 0,
-  color: {
-    dark: '#000000',
-    light: '#ffffff'
-  }
-}
+const type = ref(CLASS_TYPES[0].type)
 
 onMounted(async () => {
   await fetchUserPayments()
@@ -184,19 +172,31 @@ const fetchUser = async () => {
         if (payments.value) {
           // Get the payments for the current subscription
           const subscriptionPayments = payments.value.filter((payment) => {
-            return payment.date >= startDate && payment.date <= endDate
+            return (
+              payment.date >= startDate &&
+              payment.date <= endDate &&
+              payment.type == PAYMENT_TYPES[0].type
+            )
           })
 
-          // Calculate the total amount paid for the current subscription
-          subscription.totalPaid = subscriptionPayments.reduce(
-            (acc, payment) => acc + payment.amount,
-            0
+          // Calculate the total amount paid for the subscription
+          const amountPaid = subscriptionPayments.reduce(
+            (acc, payment) => {
+              acc.withoutDiscount += payment.amount
+              acc.withDiscount += payment.amount * (1 - payment.discount / 100)
+              return acc
+            },
+            { withoutDiscount: 0, withDiscount: 0 }
           )
+
+          // Set the total amount paid for the subscription
+          subscription.totalPaid = amountPaid.withDiscount
+          subscription.totalPaidWithoutDiscount = amountPaid.withoutDiscount
 
           // Add the debt of the subscription to the total amount
           totalBalance +=
             subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
-            subscription.totalPaid
+            subscription.totalPaidWithoutDiscount
         }
       })
 
@@ -298,6 +298,7 @@ const createClass = async () => {
     classes.value.push({
       id: docRef.id,
       userId: userId.value,
+      type: type.value,
       date: new Date(`${date.value}T${time.value}`)
     })
 
@@ -315,7 +316,6 @@ const createClass = async () => {
 const removeClass = async (classId) => {
   try {
     if (!confirmDelete()) return
-
 
     await deleteClass(classId)
     classes.value = classes.value.filter((c) => c.id !== classId)
