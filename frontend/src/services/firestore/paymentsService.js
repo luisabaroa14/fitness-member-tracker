@@ -14,7 +14,7 @@ import { PAYMENTS } from '@/utils/constants'
 
 const db = getFirestore(firebaseApp)
 
-export const addPayment = async (userId, amount, date) => {
+export const addPayment = async (userId, amount, date, discount, type) => {
   // // Example of adding a subcollection to a user
   // const paymentsCollectionRef = collection(db, USERS, userId, PAYMENTS)
   // // Add payment to the user's payments collection
@@ -27,6 +27,8 @@ export const addPayment = async (userId, amount, date) => {
     const docRef = await addDoc(collection(db, PAYMENTS), {
       userId: userId,
       amount: amount,
+      type: type,
+      discount: discount,
       date: new Date(date + 'T00:00:00')
     })
     return docRef

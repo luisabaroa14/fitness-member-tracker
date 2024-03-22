@@ -46,3 +46,15 @@ export const CLASS_TYPES = Object.freeze({
     name: import.meta.env.VITE_CLASS_TYPE_1
   }
 })
+
+export const PAYMENT_TYPES = Object.freeze({
+  0: {
+    type: '0',
+    name: import.meta.env.VITE_PAYMENT_TYPE_0,
+    
+  },
+  1: {
+    type: '1',
+    name: import.meta.env.VITE_PAYMENT_TYPE_1
+  }
+})

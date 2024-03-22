@@ -11,7 +11,7 @@
 a,
 .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: rgb(0, 189, 126);
   transition: 0.4s;
   padding: 3px;
 }
@@ -24,6 +24,10 @@ button {
   border-radius: 5px;
   background-color: rgb(0, 189, 126);
   transition: 0.4s;
+}
+
+input[type="range"] {
+  accent-color: rgb(0, 189, 126);
 }
 
 .danger {
