@@ -9,7 +9,7 @@
 
 <script setup></script>
 
-<style>
+<style scoped>
 .logo {
   width: 300px;
   height: auto;
