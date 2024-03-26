@@ -1,8 +1,8 @@
 /*
- * Function to get the current date in the format YYYY-MM-DD
+ * Function to get the max input value for the date input field.
  */
 export const maxInputDate = () =>
-  new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
 /*
  * Function to format the date and time in the specified format.

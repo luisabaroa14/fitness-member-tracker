@@ -2,7 +2,13 @@
   <div>
     <LogoIcon />
     <div class="center-item">
-      <h1>Add Class</h1>
+      <h1>{{ user?.name ?? '' }}</h1>
+      <h2 v-if="latestSubscription">
+        {{
+          `${SUBSCRIPTIONS[latestSubscription?.type]?.name} (${SUBSCRIPTIONS[latestSubscription?.type]?.hoursPerWeek > 0 ? SUBSCRIPTIONS[latestSubscription?.type]?.hoursPerWeek : 'Unlimited'} classes per week)`
+        }}
+      </h2>
+      <h2 v-else>No current subscription</h2>
       <router-link :to="{ name: 'add-payment', params: { id: userId } }"> Add payment </router-link>
       <qrcode-vue
         class="w-100"
@@ -29,12 +35,14 @@
       <h2 class="mt-1">Classes</h2>
       <div class="mb-1">
         <h3 class="center-text">Classes this week: {{ weekClasses.length }}</h3>
-        <div v-if="latestSubscription?.type">
-          <h3 v-if="SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0" class="center-text">
-            Missing classes:
-            {{ SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length }}
-          </h3>
-        </div>
+        <h3 v-if="latestSubscription" class="center-text">
+          {{
+            SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek > 0
+              ? `Missing classes: ${SUBSCRIPTIONS[latestSubscription.type]?.hoursPerWeek - weekClasses.length}`
+              : 'Unlimited classes'
+          }}
+        </h3>
+        <h3 v-else>No subscription</h3>
       </div>
       <table class="mt">
         <thead>
@@ -228,7 +236,7 @@ const setLatestSubscription = () => {
   // Loop through the subscriptions to find the latest start date
   subscriptions.forEach((subscription) => {
     const startDate = new Date(subscription.startDate)
-    if (startDate > maxStartDate) {
+    if (startDate > maxStartDate && !subscription.endDate) {
       maxStartDate = startDate
       latestSubscription.value = subscription
     }
@@ -304,9 +312,6 @@ const createClass = async () => {
 
     // Sort the classes by date
     classes.value.sort((a, b) => b.date - a.date)
-
-    // Clear the form after adding a class
-    date.value = ''
   } catch (error) {
     console.error('Error adding class: ', error.message)
     alert('An error occurred while adding a class.')

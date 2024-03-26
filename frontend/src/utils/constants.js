@@ -5,19 +5,19 @@ export const CLASSES = 'classes'
 export const SUBSCRIPTIONS = Object.freeze({
   0: {
     type: '0',
-    name: 'Básico',
+    name: 'Basic',
     hoursPerWeek: 5,
     amount: import.meta.env.VITE_SUBSCRIPTION_0_AMOUNT
   },
   1: {
     type: '1',
-    name: 'Intermedio',
+    name: 'Intermediate',
     hoursPerWeek: 8,
     amount: import.meta.env.VITE_SUBSCRIPTION_1_AMOUNT
   },
   2: {
     type: '2',
-    name: 'Avanzado',
+    name: 'Advanced',
     hoursPerWeek: 0,
     amount: import.meta.env.VITE_SUBSCRIPTION_2_AMOUNT
   },
