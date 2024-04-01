@@ -271,7 +271,7 @@ const getNextPaymentDate = (startDate) => {
   let nextPaymentYear = today.getFullYear()
 
   // If day is greater than today's date, set the next payment month to be the current month
-  if (day > today.getDate()) {
+  if (day >= today.getDate()) {
     nextPaymentMonth = today.getMonth()
   } else {
     nextPaymentMonth = today.getMonth() + 1
@@ -279,9 +279,12 @@ const getNextPaymentDate = (startDate) => {
 
   // Set the next payment date to be on the current month
   const nextPaymentDate = new Date(nextPaymentYear, nextPaymentMonth, day)
-  const startPaymentDate = new Date(nextPaymentYear, nextPaymentMonth - 1, day)
+  const startPaymentDate = new Date(nextPaymentYear, nextPaymentMonth - 1, day + 1)
 
   const hasPaymentWithin30Days = payments.value.some((payment) => {
+    // Filter monthly payments
+    if (payment.type !== PAYMENT_TYPES[0].type) return false
+
     const paymentDate = new Date(payment.date)
     return paymentDate >= startPaymentDate && paymentDate <= nextPaymentDate
   })
