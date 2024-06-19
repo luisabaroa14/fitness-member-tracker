@@ -213,7 +213,10 @@ const fetchClasses = async () => {
   }
 }
 
-const exportData = () => {
+const exportData = async () => {
+  // Fetch data
+  await fetchClasses()
+
   // Prepare combined data
   const combinedData = {
     users: [],
@@ -285,7 +288,6 @@ const exportData = () => {
 onMounted(async () => {
   await fetchPayments()
   await fetchUsers()
-  await fetchClasses()
 })
 </script>
 
