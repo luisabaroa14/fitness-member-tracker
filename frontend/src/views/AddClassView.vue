@@ -16,7 +16,7 @@
         :value="link"
         :size="300"
       ></qrcode-vue>
-      <h3>Balance: ${{ user?.totalBalance }}</h3>
+      <h3 class="bold">Balance: ${{ user?.totalBalance }}</h3>
       <h3>Next payment date: {{ calculateNextPaymentDate() }}</h3>
       <h2 class="mt-1">Class Details</h2>
       <form @submit.prevent="createClass">

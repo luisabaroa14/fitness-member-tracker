@@ -34,7 +34,7 @@
             <ul>
               <li>Paid: ${{ user.totalPaid }}</li>
               <li>Inscriptions: ${{ user.totalInscriptionPayments }}</li>
-              <li>Balance: ${{ user.totalBalance }}</li>
+              <li class="bold">Balance: ${{ user.totalBalance }}</li>
             </ul>
           </td>
           <td>
@@ -49,7 +49,7 @@
                 <p>
                   Discount: ${{ subscription.totalPaidWithoutDiscount - subscription.totalPaid }}
                 </p>
-                <p>
+                <p class="bold">
                   Balance: ${{
                     subscription.diffMonths * SUBSCRIPTIONS[subscription.type].amount -
                     subscription.totalPaidWithoutDiscount
