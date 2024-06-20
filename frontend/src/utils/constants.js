@@ -26,6 +26,12 @@ export const SUBSCRIPTIONS = Object.freeze({
     name: 'Free Gym',
     hoursPerWeek: 0,
     amount: import.meta.env.VITE_SUBSCRIPTION_3_AMOUNT
+  },
+  4: {
+    type: '4',
+    name: 'Climbing Kids',
+    hoursPerWeek: 0,
+    amount: import.meta.env.VITE_SUBSCRIPTION_4_AMOUNT
   }
 })
 
@@ -37,6 +43,10 @@ export const CLASS_TYPES = Object.freeze({
   1: {
     type: '1',
     name: import.meta.env.VITE_CLASS_TYPE_1
+  },
+  2: {
+    type: '2',
+    name: import.meta.env.VITE_CLASS_TYPE_2
   }
 })
 

@@ -4,6 +4,11 @@
     <router-link to="/create-user">Create User</router-link>
     <button style="margin: 0px 20px" @click="exportData">Export Data</button>
     <input type="text" v-model="searchInput" placeholder="Search" />
+    <span class="bold" style="margin: 0px 20px">Total users: {{ users.length }}</span>
+    <span class="bold" style="margin: 0px 10px">
+      Active users:
+      {{ users.filter((u) => u.subscriptionData.some((s) => !s?.endDate)).length }}</span
+    >
     <table class="w-100 h-100" style="margin-top: 20px">
       <thead>
         <tr>
